@@ -13,17 +13,13 @@ class Game(MutableMapping):
     def __init__(self, props=None):
         if not props:
             self.props = {}
-            self.props["url"] = random_string(6)
+            self.props["_id"] = random_string(6)
             self.props["secret"] = {}
-            self.props["secret"]["white"] = random_string(3)
-            self.props["secret"]["black"] = random_string(3)
+            self.props["secret"]["w"] = random_string(4)
+            self.props["secret"]["b"] = random_string(4)
             self.props["fen"] = chess.Board().fen()
         else:
-            assert type(props) == str
             self.props = json.loads(props)
-
-    def __str__(self):
-        return json.dumps(self.props)
 
     def __delitem__(self, key):
         del self.props[key]
@@ -47,18 +43,7 @@ class Game(MutableMapping):
         s = chess.Board(self.props["fen"]).legal_moves
         return [x.uci() for x in list(s)]
 
-    def move_white(self, move, secret):
-        if self.props["secret"]["white"] == secret:
-            if move in self.moves_here():
-                temp = chess.Board(self.props["fen"])
-                temp.push_uci(move)
-                self.props["fen"] = temp.fen()
-                return self.props["fen"]
-
-    def move_black(self, move, secret):
-        if self.props["secret"]["black"] == secret:
-            if move in self.moves_here():
-                temp = chess.Board(self.props["fen"])
-                temp.push_sa(move)
-                self.props["fen"] = temp.fen()
-                return self.props["fen"]
+    def push_san(self, move):
+        temp = chess.Board(self.props["fen"])
+        temp.push_san(move)
+        self.props["fen"] = temp.fen()
