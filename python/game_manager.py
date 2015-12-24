@@ -1,18 +1,33 @@
-import pymongo
+from pymongo import MongoClient
+from flask import Flask
 import Game
 
+app = Flask(__name__)
 
-def create_game(pymongo_instance):
+db = MongoClient("mongodb://hi:hi@ds035735.mongolab.com:35735/chess")\
+    .chess.gems
+
+
+@app.route('/')
+def index():
+    return "THIS IS CHESS !!!11!!"
+
+
+@app.route('/create/')
+def create_game():
     diz_gem = Game.Game()
-    pymongo_instance.insert_one(diz_gem)
-    return diz_gem
+    db.insert_one(diz_gem)
+    ret = str(diz_gem["secret"]) + str(diz_gem["url"])
+    return ret
 
 
-def get_gaem(pymongo_instance, url):
+@app.route('/<gem_id>')
+def get_fen(gem_id):
     try:
-        return pymongo_instance.find_one({"url": url})
-    except:
-        print "THEFUCK"
+        return str(db.find_one({"url": gem_id}))
+    except Exception, e:
+        print e
 
-db = pymongo.MongoClient("mongodb://hi:hi@ds035735.mongolab.com:35735/chess")
-create_game(db.chess.gems)
+
+if __name__ == '__main__':
+    app.run(debug=True)
