@@ -1,0 +1,3 @@
+[submodule "pychess"]
+	path = pychess
+	url = http://github.com/xrisk/pychess
