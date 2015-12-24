@@ -1,6 +1,7 @@
 from collections import MutableMapping
 import string
 import random
+import json
 import chess
 
 
@@ -9,16 +10,23 @@ def random_string(l):
 
 
 class Game(MutableMapping):
-    def __init__(self):
-        self.props = {}
-        self.props["url"] = random_string(6)
-        self.props["secret"] = {}
-        self.props["secret"]["white"] = random_string(3)
-        self.props["secret"]["black"] = random_string(3)
-        self.props["fen"] = chess.Board().fen()
+    def __init__(self, props=None):
+        if not props:
+            self.props = {}
+            self.props["url"] = random_string(6)
+            self.props["secret"] = {}
+            self.props["secret"]["white"] = random_string(3)
+            self.props["secret"]["black"] = random_string(3)
+            self.props["fen"] = chess.Board().fen()
+        else:
+            assert type(props) == str
+            self.props = json.loads(props)
 
-    def __delitem__(self):
-        pass
+    def __str__(self):
+        return json.dumps(self.props)
+
+    def __delitem__(self, key):
+        del self.props[key]
 
     def __getitem__(self, key):
         return self.props[key]
@@ -35,7 +43,7 @@ class Game(MutableMapping):
     def get_fen(self):
         return self.props["fen"]
 
-    def moves_here(self):
+    def legal_moves(self):
         s = chess.Board(self.props["fen"]).legal_moves
         return [x.uci() for x in list(s)]
 
