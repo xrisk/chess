@@ -13,6 +13,9 @@ class Game(MutableMapping):
     def __init__(self, props=None):
         if not props:
             self.props = {}
+            self.props["joined"] = {}
+            self.props["joined"]["b"] = False
+            self.props["joined"]["w"] = False
             self.props["_id"] = random_string(6)
             self.props["secret"] = {}
             self.props["secret"]["w"] = random_string(4)
