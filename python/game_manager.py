@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from flask import Flask
 from flask import request
 import chess
+import base64
 import Game
 
 app = Flask(__name__)
@@ -46,22 +47,29 @@ def make_move(url):
             if record["secret"][request.form["fen"].split()[1]] == url[-4:]:
                 this_game = Game.Game()
                 this_game.props = record
-                assert request.form["move"] in this_game.legal_moves()
-                this_game.push_san(request.form["move"])
-                db.delete_one({"_id": url[:6]})
-                db.insert_one(this_game)
-                return "OK"
+                if request.form["move"] in this_game.legal_moves():
+                    this_game.push_san(request.form["move"])
+                    db.delete_one({"_id": url[:6]})
+                    db.insert_one(this_game)
+                    return "OK. Your new FEN is " + str(this_game.props["fen"])
+                else:
+                    return "That is not a valid move."
             else:
-                return "Invalid secret."
+                return "Invalid secret. Or it's not your turn."
         else:
             return "You are referring to an old position, update your FEN."
     except Exception, e:
         return "Something went wrong, we have no clue what " + str(e)
 
 
-@app.route('/api/moves/<fen>/')
-def get_valid_moves(fen):
-    return [x.uci() for x in chess.Board(fen).legal_moves]
+@app.route('/api/moves/<url>/')
+def get_valid_moves(url):
+    try:
+        fen = db.find_one({"_id": str(url)})["fen"]
+        board = chess.Board(fen)
+        return str([x.uci() for x in board.legal_moves])
+    except Exception, e:
+        return "Something wrong happened. Ignorance is bliss!"
 
 
 if __name__ == '__main__':
