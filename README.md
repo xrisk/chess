@@ -1,6 +1,6 @@
 # l33tchess
 
-An online multiplayer chess game. After starting a game, send the link to a friend and begin. (Click here to play!)
+An online multiplayer chess game. After starting a game, send the link to a friend and begin. (Click here to play!) <-- Working on a link
 
 ### Current Features
 - has chessboard
@@ -15,5 +15,5 @@ An online multiplayer chess game. After starting a game, send the link to a frie
 
 ### About
 - contributors: xrisk, onlineth, DizzyCode, (and you can be one too!)
-- license: (add something)
+- license: GNU v3
 - uses html, css, python, (and other stuff)
